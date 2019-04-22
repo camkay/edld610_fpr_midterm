@@ -43,7 +43,7 @@ Conduct some basic data cleaning to make your data file look like the following.
 data <- map_df(15:18, download_file)
 
 # tidy the data
-test <- data %>%
+data %<>%
   # clean the column names
   janitor::clean_names() %>%
   # filter for only white and hispanic/latino students
@@ -55,7 +55,19 @@ test <- data %>%
          school,
          student_group,
          grade_level,
-         ends_with("level_[[:digit:]]"))
+         starts_with("number_level")) %>%
+  # gather by level
+  gather(key = "level", value = "n", starts_with("number_level")) %>%
+  # parse level number
+  mutate(level = parse_number(level)) %>%
+  # drop rows with missing data
+  filter(!is.na(n)) %>%
+  # arrange in same order as midterm example (for sanity)
+  arrange(academic_year,
+          district,
+          student_group,
+          grade_level,
+          level)
   
 ```
 
@@ -64,7 +76,10 @@ test <- data %>%
 Calculate the cumulative n for each school by student group, grade, and academic year. The result should look like the below. Hint, look at `?base::cumsum.`
 
 ```{r parta_question2_cam}
-
+# create a cumulative n column
+data %<>%
+  group_by(student_group, grade_level, academic_year) %>%
+  mutate(cn = cumsum(n))
 ```
 
 ### Question 3 (3 points)
