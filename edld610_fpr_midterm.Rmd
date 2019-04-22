@@ -1,0 +1,15 @@
+---
+title: "Midterm"
+author: "Cameron Kay & Ashley Miller"
+date: "4/22/2019"
+output:
+  html_document:
+    theme: spacelab
+    toc: yes
+    toc_depth: 4
+    toc_float: yes
+---
+
+```{r setup, include = FALSE}
+
+```
