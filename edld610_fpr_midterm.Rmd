@@ -87,7 +87,17 @@ data %<>%
 Reformat the data so it looks like the below, removing `n` and filling by `cn`. Remove rows that have missing data for either student group.
 
 ```{r parta_question3_cam}
-
+# reformat data
+data %<>%
+  # drop n
+  select(-n) %>%
+  # spread cn by student group
+  spread(key = student_group, value = cn) %>%
+  # clean new column names
+  janitor::clean_names() %>%
+  # drop rows with missing cn
+  filter(!is.na(hispanic_latino),
+         !is.na(white))
 ```
 
 ## Part B: Achievement gaps
