@@ -15,6 +15,8 @@ output:
 library(tidyverse)
 library(glue)
 library(rio)
+library(pracma)
+library(magrittr)
 ```
 
 ## Part A: Data
@@ -36,8 +38,25 @@ Conduct some basic data cleaning to make your data file look like the following.
   + Select variables related to the number of students in each of the levels (1:4), and not percentages or collapsed levels.
   + Remove any row that has missing data in any of the n variables
   
-```{r parta_question1_cam}
+```{r parta_question1_cam, cache = TRUE}
+# download the data
+data <- map_df(15:18, download_file)
 
+# tidy the data
+test <- data %>%
+  # clean the column names
+  janitor::clean_names() %>%
+  # filter for only white and hispanic/latino students
+  filter(student_group == "White" |
+         student_group == "Hispanic/Latino") %>%
+  # drop percentages or collapsed levels 
+  select(academic_year,
+         district,
+         school,
+         student_group,
+         grade_level,
+         ends_with("level_[[:digit:]]"))
+  
 ```
 
 ### Question 2 (2 points)
