@@ -102,11 +102,38 @@ data %<>%
 
 ## Part B: Achievement gaps
 
+The function below estimates the average difference between two distributions in terms of an effect size. In this case, we are using the cumulative counts to approximate the empirical cumulative distribution function for each group. The distance between the distributions is then estimated and transformed to an effect size-like measure (for more information, see Ho & Reardon, 2012). The nice thing about this approach, is that we’re able to obtain an effect size on the average difference in achievement between to groups of students as if we had the full, student level data even though we just have the counts within each category.
+
+In the below function, the first argument supplied is the data source, followed by two string variables, the names of the reference and focal distributions, respectively (e.g., "white" and "hispanic_latino" in this case).
+
+Note - you’ll need to install the {pracma} package first (assuming you don’t have it installed already, of course).
+
+```{r Daniel'sCode_partB}
+# install.packages("pracma")
+gap <- function(data, ref, foc) {
+    x <- data[[ref]]
+    y <- data[[foc]]
+    auc <- pracma::trapz(y / y[length(x)],
+                         x / x[length(x)])
+    sqrt(2)*qnorm(auc)
+}
+
+### Example
+gap(data[1:4, ], "white", "hispanic_latino") #should be -0.6091404
+```
+
 ### Question 1 (10 points) 
 
 Estimate an achievement gap effect size for every school in the state that reported data on both student groups (i.e., using the data we created above), for each grade level in each academic year.
 
 ```{r partb_question1_cam}
+
+by_school <- split(data, data$school)
+
+by_school %>%
+  map(~gap(.x, "white", "hispanic_latino"))
+
+#now we need to figure out how to do the above for every grade level in each academic year
 
 ```
 
