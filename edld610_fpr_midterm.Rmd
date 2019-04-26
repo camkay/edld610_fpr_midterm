@@ -108,20 +108,6 @@ In the below function, the first argument supplied is the data source, followed 
 
 Note - you’ll need to install the {pracma} package first (assuming you don’t have it installed already, of course).
 
-```{r Daniel'sCode_partB}
-# install.packages("pracma")
-gap <- function(data, ref, foc) {
-    x <- data[[ref]]
-    y <- data[[foc]]
-    auc <- pracma::trapz(y / y[length(x)],
-                         x / x[length(x)])
-    sqrt(2)*qnorm(auc)
-}
-
-### Example
-gap(data[1:4, ], "white", "hispanic_latino") #should be -0.6091404
-```
-
 ### Question 1 (10 points) 
 
 ```{r parta_question1_example}
@@ -131,7 +117,7 @@ gap <- function(data, ref, foc) {
     y <- data[[foc]]
     auc <- pracma::trapz(y / y[length(x)],
                          x / x[length(x)])
-    sqrt(2)*qnorm(auc)
+    sqrt(2) * qnorm(auc)
 }
 
 # example
@@ -141,18 +127,32 @@ gap(data[1:4, ], "white", "hispanic_latino")
 Estimate an achievement gap effect size for every school in the state that reported data on both student groups (i.e., using the data we created above), for each grade level in each academic year.
 
 ```{r partb_question1_cam}
-test <- split(data, data$academic_year, data$school, data$grade_level)
+# split the data by school, academic year, and grade level
+data_split <- data %>%
+  # split by school
+  split(.$school) %>%
+  # split by grade level
+  map(~split(.x, .x$grade_level)) %>%
+  # split by academic year
+  map(~map(.x, ~split(.x, .x$academic_year)))
 
-map_dbl()
+# calculate effect sizes for each school by academic year and grade level
+gap_es <- data_split %>%
+  map(~map(.x, ~map(.x, ~gap(.x, "white", "hispanic_latino"))))
 
+# create a dataframe with school, grade, and academic year in it
+data_es <- data %>%
+  filter(level == 1) %>%
+  select(school, grade_level, academic_year, district) %>%
+  arrange(school)
 
-by_school <- split(data, data$school)
+# extract all effect sizes from gap_es and add to data_es
+test <- unlist(gap_es)
+na.omit(unlist(gap_es))
 
-by_school %>%
-  map(~gap(.x, "white", "hispanic_latino"))
+data_es$gap_es <- c(unlist(gap_es), rep(NA, times = (nrow(data_es) - length(unlist(gap_es)))))
 
-#now we need to figure out how to do the above for every grade level in each academic year
-
+test
 ```
 
 ### Question 2 (10 points) 
