@@ -127,32 +127,32 @@ gap(data[1:4, ], "white", "hispanic_latino")
 Estimate an achievement gap effect size for every school in the state that reported data on both student groups (i.e., using the data we created above), for each grade level in each academic year.
 
 ```{r partb_question1_cam}
-# split the data by school, academic year, and grade level
-data_split <- data %>%
-  # split by school
-  split(.$school) %>%
-  # split by grade level
-  map(~split(.x, .x$grade_level)) %>%
-  # split by academic year
-  map(~map(.x, ~split(.x, .x$academic_year)))
-
-# calculate effect sizes for each school by academic year and grade level
-gap_es <- data_split %>%
-  map(~map(.x, ~map(.x, ~gap(.x, "white", "hispanic_latino"))))
-
-# create a dataframe with school, grade, and academic year in it
+# create a unique identifier using school, academic year, and grade level
 data_es <- data %>%
+  # combine district, school, grade_level, and academic_year
+  mutate(id = paste(district, school, grade_level, academic_year)) %>%
+  # replace spaces with underscores and make the entire id lowercase
+  mutate(id = gsub(" ", "_", id),
+         id = tolower(id))
+
+# split using the id column
+data_es_split <- data_es %>%
+  split(data_es$id)
+
+# calculate the effect size for each unique id and save as a vector of doubles
+es <- map_dbl(data_es_split, gap, ref = "white", foc = "hispanic_latino")
+
+# prepare dataframe for addition of effect sizes
+data_es %<>%
+  # retain only one column for each school/year/grade combination
   filter(level == 1) %>%
-  select(school, grade_level, academic_year, district) %>%
-  arrange(school)
+  # arrange using the unique id
+  arrange(id) %>%
+  # drop the id and level columns
+  select(-id, -level)
 
-# extract all effect sizes from gap_es and add to data_es
-test <- unlist(gap_es)
-na.omit(unlist(gap_es))
-
-data_es$gap_es <- c(unlist(gap_es), rep(NA, times = (nrow(data_es) - length(unlist(gap_es)))))
-
-test
+# add effect sizes to the dataframe
+data_es$effect_sizes <- es
 ```
 
 ### Question 2 (10 points) 
@@ -160,6 +160,7 @@ test
 The plot below shows the achievement gap estimates for one school by grade in Ashland School District during the 2017-18 school year. Produce a similar plot to the below (noting the school, academic year, and school district) for each of the first 100 unique school/year/district combinations. Hint - you’ll want to use your effect size data from from the previous question, nest it, then apply `slice(1:100)`. Note that the only reason I’m asking you to slice the data frame is just to reduce run time. In reality, you would do this for all school/year/district combinations.
 
 ```{r partb_question2_ash}
+# use the data called data_es
 
 ```
 
