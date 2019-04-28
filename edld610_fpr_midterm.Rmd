@@ -127,32 +127,25 @@ gap(data[1:4, ], "white", "hispanic_latino")
 Estimate an achievement gap effect size for every school in the state that reported data on both student groups (i.e., using the data we created above), for each grade level in each academic year.
 
 ```{r partb_question1_cam}
-# create a unique identifier using school, academic year, and grade level
+# convert district, school, grade, and academic level to factors. Note: I 
+# included district, because I was running into an error where multiple schools
+# shared a single name
 data_es <- data %>%
-  # combine district, school, grade_level, and academic_year
-  mutate(id = paste(district, school, grade_level, academic_year)) %>%
-  # replace spaces with underscores and make the entire id lowercase
-  mutate(id = gsub(" ", "_", id),
-         id = tolower(id))
+  ungroup() %>%
+  mutate(district      = factor(district),
+         school        = factor(school),
+         grade_level   = factor(grade_level),
+         academic_year = factor(academic_year))
 
-# split using the id column
-data_es_split <- data_es %>%
-  split(data_es$id)
-
-# calculate the effect size for each unique id and save as a vector of doubles
-es <- map_dbl(data_es_split, gap, ref = "white", foc = "hispanic_latino")
-
-# prepare dataframe for addition of effect sizes
+# nest data
 data_es %<>%
-  # retain only one column for each school/year/grade combination
-  filter(level == 1) %>%
-  # arrange using the unique id
-  arrange(id) %>%
-  # drop the id and level columns
-  select(-id, -level)
+  nest(-district, 
+       -school,
+       -grade_level,
+       -academic_year)
 
-# add effect sizes to the dataframe
-data_es$effect_sizes <- es
+# calculate effect sizes and assign to new column named gap_es
+data_es$gap_es <- map_dbl(data_es$data, gap, ref = "white", foc = "hispanic_latino")
 ```
 
 ### Question 2 (10 points) 
