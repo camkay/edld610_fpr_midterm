@@ -155,6 +155,40 @@ The plot below shows the achievement gap estimates for one school by grade in As
 ```{r partb_question2_ash}
 # use the data called data_es
 
+data_es %<>%
+  ungroup() %>%
+  mutate(school = as.factor(school),
+         district = as.factor(district),
+         academic_year = as.factor(academic_year),
+         grade_level = as.factor(grade_level))
+
+plot_data <- data_es %>%
+  nest(-school, -grade_level, -academic_year) %>%
+  slice(1:100)
+
+str(plot_data$data)
+
+map_dbl(plot_data$data, ~mean(.x$gap))
+
+test <- plot_data %>%
+    #gather(school, grade_level, academic_year) %>%
+    mutate(gap = map_dbl(plot_data$data, ~mean(.x$gap)))
+
+test %>%
+  ggplot(aes(grade_level, gap)) +
+    geom_col(aes(fill = gap)) +
+    #facet_wrap(~school) +
+    scale_fill_viridis_c() +
+    coord_flip()
+
+
+plots_by_month <- map(test, function(x) {
+  ggplot(x, aes(grade_level, gap)) +
+    geom_col(aes(fill = gap)) +
+    scale_fill_viridis_c() +
+    coord_flip()
+})
+
 ```
 
 ### Question 3 (10 points) 
