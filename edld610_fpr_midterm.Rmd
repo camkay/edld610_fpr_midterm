@@ -17,6 +17,7 @@ library(glue)
 library(rio)
 library(pracma)
 library(magrittr)
+library(rcartocolor)
 ```
 
 ## Part A: Data
@@ -160,35 +161,50 @@ The plot below shows the achievement gap estimates for one school by grade in As
 
 # nest by school, academic year, school district, and grade level and keep only the first 100 observations
 plot_data <- data_es %>%
-  nest(-school, -grade_level, -academic_year, -district, -gap_es) %>%
   mutate(grade_level = as.character(grade_level)) %>%
   mutate(grade_level = parse_number(grade_level)) %>%
   mutate(grade_level = as.factor(grade_level)) %>%
+  nest(-school, -grade_level, -academic_year, -district, -gap_es) %>%
+  #nest(-school) %>%
   slice(1:100)
+
+str(plot_data)
 
 plot_data %>%
   filter(school == "Ashland Middle School") %>%
   ggplot(aes(grade_level, gap_es)) +
     geom_col(aes(fill = gap_es)) +
-    scale_fill_viridis_c() +
+    scale_fill_carto_c(palette = "Burg") +
     coord_flip() +
     theme_minimal() +
-    theme(legend.position = "bottom") +
+    theme(legend.position = "bottom",
+          legend.title = NULL) +
     labs(caption = "2014-2015 school year, Ashland School District, Oregon",
          y = "Effect Size",
-         x = "Grade",
-         colour = "") +
+         x = "Grade") +
     geom_hline(aes(yintercept = 0),
                color = "gray30", 
                lty = "dashed")
 
+indiv_plot <- function(data, var) {
+    p <- ggplot(data, aes(grade_level, gap_es)) +
+             geom_col(aes(fill = gap_es)) +
+             scale_fill_carto_c(palette = "Burg") +
+             coord_flip() +
+             theme_minimal() +
+             theme(legend.position = "bottom",
+                  legend.title = NULL) +
+        labs(title = var,
+             y = "Effect Size",
+             x = "Grade") +
+    if(var == "school") {
+        p <- p + labs(title = "Achievment Gap Estimates:",
+                      subtitle = var)
+    }
+    return(p)
+}
 
-plots_by_month <- map(plot_data, function(x) {
-  ggplot(x, aes(grade_level, gap_es)) +
-    geom_col(aes(fill = gap_es)) +
-    scale_fill_viridis_c() +
-    coord_flip()
-})
+map(plot_data, ~indiv_plot(.x, school))
 
 ```
 
