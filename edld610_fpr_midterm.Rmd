@@ -214,22 +214,23 @@ final_plots$plots[[100]]
 Save the plots into a “plots” directory. Make sure the file names are meaningful.
 
 ```{r partb_question3_ash}
-
+# create a name for the plot files
 final_plots %<>%
-  mutate(path = paste(district, school, academic_year, sep = "_"),
-         path = gsub(" ", "_", path),
-         path = tolower(path))
+  mutate(file_name = paste(district, school, academic_year, sep = "_"),
+         file_name = gsub(" ", "_", file_name),
+         file_name = tolower(file_name),
+         file_name = glue("{file_name}.png"))
 
-fs::dir_create(here::here("plots", "gaps"))
+# create a plots directory
+fs::dir_create(here::here("plots"))
 
-files <- final_plots$path
-  
-paths <- here::here("plots", "gaps", glue("{files}.png"))
-paths
+# create file paths
+paths <- here::here("plots", final_plots$file_name)
 
+# walk the plots and save using the paths
 walk2(paths, final_plots$plots, ggsave,
-      width = 9.5, 
+      # specify image dimensions and resolution
+      width  = 9.5, 
       height = 6.5,
-      dpi = 500)
-
+      dpi    = 500)
 ```
