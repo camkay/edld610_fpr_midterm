@@ -159,15 +159,23 @@ data_es %<>%
 The plot below shows the achievement gap estimates for one school by grade in Ashland School District during the 2017-18 school year. Produce a similar plot to the below (noting the school, academic year, and school district) for each of the first 100 unique school/year/district combinations. Hint - you’ll want to use your effect size data from from the previous question, nest it, then apply `slice(1:100)`. Note that the only reason I’m asking you to slice the data frame is just to reduce run time. In reality, you would do this for all school/year/district combinations.
 
 ```{r partb_question2_ash}
+<<<<<<< Updated upstream
 
 # nest by school, academic year, and school district,
 # keep only the first 100 observations
 
+=======
+# nest by school, academic year, school district, and grade level and keep only the first 100 observations
+>>>>>>> Stashed changes
 plot_data <- data_es %>%
   mutate(grade_level = as.character(grade_level)) %>%
   mutate(grade_level = parse_number(grade_level)) %>%
   mutate(grade_level = as.factor(grade_level)) %>%
   nest(-school, -academic_year, -district) %>%
+<<<<<<< Updated upstream
+=======
+  #nest(-school) %>%
+>>>>>>> Stashed changes
   slice(1:100)
 
 # create column of plots
@@ -175,13 +183,19 @@ plot_data %<>%
   mutate(plots = pmap(
     # create list of plot resources
     list(data_for_plot = plot_data$data,
+<<<<<<< Updated upstream
          district = plot_data$district,
          school = plot_data$school,
+=======
+         district      = plot_data$district,
+         school        = plot_data$school,
+>>>>>>> Stashed changes
          academic_year = plot_data$academic_year),
     # create plots
     function(data_for_plot, district, school, academic_year) {
       ggplot(data_for_plot, aes(x = grade_level, y = gap_es)) +
         geom_col(aes(fill = gap_es)) +
+<<<<<<< Updated upstream
         scale_fill_carto_c(palette = "Burg",
                            name = "") + 
                            #limits = c(-6,2)) +
@@ -198,6 +212,20 @@ plot_data %<>%
         geom_hline(aes(yintercept = 0),
                        color = "gray30", 
                        lty = "dashed")
+=======
+        scale_fill_carto_c(palette = "Burg") +
+        coord_flip() +
+        theme_minimal() +
+        theme(legend.position = "bottom",
+              legend.title    = NULL) +
+        labs(title   = glue("Achievement Gap Estimate: {school}"),
+             caption = glue("{academic_year} school year, {district}, Oregon"),
+             y       = "Effect Size",
+             x       = "Grade") +
+        geom_hline(aes(yintercept = 0),
+                       color      = "gray30", 
+                       lty        = "dashed")
+>>>>>>> Stashed changes
 }))
 
 # look at a couple of plots
