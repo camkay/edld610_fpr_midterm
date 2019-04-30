@@ -182,9 +182,9 @@ final_plots <- plot_data %>%
       ggplot(data_for_plot, aes(x = grade_level, y = gap_es)) +
         geom_col(aes(fill = gap_es)) +
         scale_fill_viridis_c(name = "", 
-                             limits = c(-2,2),
-                             breaks = c(-2, -1, 0, 1, 2),
-                             labels = c("-2", "", "0", "", "2")) +
+                             limits = c(-3, 1),
+                             breaks = c(-3, -2, -1, 0, 1),
+                             labels = c("-3", "-2", "-1", "0", "1")) +
         coord_flip() +
         theme_minimal() +
         theme(legend.position = "bottom") +
@@ -223,7 +223,6 @@ final_plots %<>%
 fs::dir_create(here::here("plots", "gaps"))
 
 files <- final_plots$path
-
   
 paths <- here::here("plots", "gaps", glue("{files}.png"))
 paths
