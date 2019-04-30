@@ -152,6 +152,7 @@ data_es$gap_es <- map_dbl(data_es$data, gap, ref = "white", foc = "hispanic_lati
 # unnest the data 
 data_es %<>%
   unnest()
+
 ```
 
 ### Question 2 (10 points) 
@@ -169,8 +170,8 @@ plot_data <- data_es %>%
   slice(1:100)
 
 # create column of plots
-plot_data %<>%
-  mutate(plots = pmap(
+final_plots <- plot_data %>%
+    mutate(plots = pmap(
     # create list of plot resources
     list(data_for_plot = plot_data$data,
          district      = plot_data$district,
@@ -180,11 +181,10 @@ plot_data %<>%
     function(data_for_plot, district, school, academic_year) {
       ggplot(data_for_plot, aes(x = grade_level, y = gap_es)) +
         geom_col(aes(fill = gap_es)) +
-        scale_fill_viridis_c(
-                           name = "", 
-                           limits = c(-2,2),
-                           breaks = c(-2, -1, 0, 1, 2),
-                           labels = c("-2", "", "0", "", "2")) +
+        scale_fill_viridis_c(name = "", 
+                             limits = c(-2,2),
+                             breaks = c(-2, -1, 0, 1, 2),
+                             labels = c("-2", "", "0", "", "2")) +
         coord_flip() +
         theme_minimal() +
         theme(legend.position = "bottom") +
@@ -199,13 +199,13 @@ plot_data %<>%
 }))
 
 # look at a couple of plots
-plot_data$plots[[1]]
-plot_data$plots[[2]]
-plot_data$plots[[3]]
-plot_data$plots[[5]]
-plot_data$plots[[10]]
-plot_data$plots[[50]]
-plot_data$plots[[100]]
+final_plots$plots[[1]]
+final_plots$plots[[2]]
+final_plots$plots[[3]]
+final_plots$plots[[5]]
+final_plots$plots[[10]]
+final_plots$plots[[50]]
+final_plots$plots[[100]]
 
 ```
 
@@ -214,5 +214,23 @@ plot_data$plots[[100]]
 Save the plots into a “plots” directory. Make sure the file names are meaningful.
 
 ```{r partb_question3_ash}
+
+final_plots %<>%
+  mutate(path = paste(district, school, academic_year, sep = "_"),
+         path = gsub(" ", "_", path),
+         path = tolower(path))
+
+fs::dir_create(here::here("plots", "gaps"))
+
+files <- final_plots$path
+
+  
+paths <- here::here("plots", "gaps", glue("{files}.png"))
+paths
+
+walk2(paths, final_plots$plots, ggsave,
+      width = 9.5, 
+      height = 6.5,
+      dpi = 500)
 
 ```
