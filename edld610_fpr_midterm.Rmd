@@ -186,9 +186,9 @@ final_plots <- plot_data %>%
         geom_col(position = "dodge") +
         # set fill scale parameters
         scale_fill_viridis_c(name   = "", 
-                             limits = c(-3, 2),
-                             breaks = c(-3, -2, -1, 0, 1, 2),
-                             labels = c("-3", "-2", "-1", "0", "1", "2")) +
+                             limits = c(-2.7, 1.5),
+                             breaks = c(-2, -1, 0, 1),
+                             labels = c("-2", "-1", "0", "1")) +
         # flip the coordinates
         coord_flip() +
         # apply theme minimal
