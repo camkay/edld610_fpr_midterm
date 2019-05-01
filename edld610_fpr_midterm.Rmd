@@ -163,10 +163,13 @@ The plot below shows the achievement gap estimates for one school by grade in As
 # nest by school, academic year, and school district,
 # keep only the first 100 observations
 plot_data <- data_es %>%
+  # extract grade number from grade_level
   mutate(grade_level = as.character(grade_level)) %>%
   mutate(grade_level = parse_number(grade_level)) %>%
   mutate(grade_level = as.factor(grade_level)) %>%
+  # nest by school, academic year, and district
   nest(-school, -academic_year, -district) %>%
+  # retain only first 100 rows
   slice(1:100)
 
 # create column of plots
@@ -179,23 +182,29 @@ final_plots <- plot_data %>%
          academic_year = plot_data$academic_year),
     # create plots
     function(data_for_plot, district, school, academic_year) {
-      ggplot(data_for_plot, aes(x = grade_level, y = gap_es)) +
-        geom_col(aes(fill = gap_es)) +
-        scale_fill_viridis_c(name = "", 
+      ggplot(data_for_plot, aes(x = grade_level, y = gap_es, fill = gap_es)) +
+        geom_col() +
+        # set fill scale parameters
+        scale_fill_viridis_c(name   = "", 
                              limits = c(-3, 1),
                              breaks = c(-3, -2, -1, 0, 1),
                              labels = c("-3", "-2", "-1", "0", "1")) +
+        # flip the coordinates
         coord_flip() +
+        # apply theme minimal
         theme_minimal() +
+        # moves legend to the the bottom of the plot
         theme(legend.position = "bottom") +
-        labs(title = glue("Achievement Gap Estimate: {school}"),
-             caption = glue("{academic_year} school year, {district}, Oregon"),
+        # set labels
+        labs(title    = glue("Achievement Gap Estimate: {school}"),
+             caption  = glue("{academic_year} school year, {district}, Oregon"),
              subtitle = "Students coded as White as compared to those coded as Hispanic/Latino",
-             y = "Effect Size",
-             x = "Grade") +
+             y        = "Effect Size",
+             x        = "Grade") +
+        # add horizontal line at 0
         geom_hline(aes(yintercept = 0),
-                       color = "gray30", 
-                       lty = "dashed")
+                       color      = "gray30", 
+                       lty        = "dashed")
 }))
 
 # look at a couple of plots
