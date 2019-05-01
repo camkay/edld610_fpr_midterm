@@ -79,7 +79,7 @@ Calculate the cumulative n for each school by student group, grade, and academic
 ```{r parta_question2_cam}
 # create a cumulative n column
 data %<>%
-  group_by(student_group, grade_level, academic_year) %>% #ASH: Why do we not group by school here???
+  group_by(school, student_group, grade_level, academic_year) %>%
   mutate(cn = cumsum(n))
 
 ```
@@ -183,12 +183,12 @@ final_plots <- plot_data %>%
     # create plots
     function(data_for_plot, district, school, academic_year) {
       ggplot(data_for_plot, aes(x = grade_level, y = gap_es, fill = gap_es)) +
-        geom_col() +
+        geom_col(position = "dodge") +
         # set fill scale parameters
         scale_fill_viridis_c(name   = "", 
-                             limits = c(-3, 1),
-                             breaks = c(-3, -2, -1, 0, 1),
-                             labels = c("-3", "-2", "-1", "0", "1")) +
+                             limits = c(-3, 2),
+                             breaks = c(-3, -2, -1, 0, 1, 2),
+                             labels = c("-3", "-2", "-1", "0", "1", "2")) +
         # flip the coordinates
         coord_flip() +
         # apply theme minimal
