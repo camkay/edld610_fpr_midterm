@@ -69,7 +69,8 @@ data %<>%
           student_group,
           grade_level,
           level)
-  
+ 
+head(data) 
 ```
 
 ### Question 2 (2 points)
@@ -82,6 +83,7 @@ data %<>%
   group_by(school, student_group, grade_level, academic_year) %>%
   mutate(cn = cumsum(n))
 
+head(data)
 ```
 
 ### Question 3 (3 points)
@@ -100,6 +102,8 @@ data %<>%
   # drop rows with missing cn
   filter(!is.na(hispanic_latino),
          !is.na(white))
+
+head(data)
 ```
 
 ## Part B: Achievement gaps
@@ -112,7 +116,7 @@ Note - you’ll need to install the {pracma} package first (assuming you don’t
 
 ### Question 1 (10 points) 
 
-```{r parta_question1_example}
+```{r partb_question1_example}
 # create function
 gap <- function(data, ref, foc) {
     x <- data[[ref]]
@@ -209,12 +213,10 @@ final_plots <- plot_data %>%
 
 # look at a couple of plots
 final_plots$plots[[1]]
-final_plots$plots[[2]]
 final_plots$plots[[3]]
-final_plots$plots[[5]]
-final_plots$plots[[10]]
-final_plots$plots[[50]]
-final_plots$plots[[100]]
+final_plots$plots[[60]]
+final_plots$plots[[78]]
+final_plots$plots[[98]]
 
 ```
 
